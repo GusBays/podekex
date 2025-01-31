@@ -1,0 +1,22 @@
+$grid-breakpoints: (
+  "xs": 0,          // Extra pequeno
+  "sm": 576px,      // Pequeno
+  "md": 768px,      // Médio
+  "lg": 992px,      // Grande
+  "xl": 1200px,     // Extra grande
+  "xxl": 1400px     // Extra extra grande
+);
+
+.container {
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 15px;
+  padding-right: 15px;
+
+  // Define a largura para diferentes tamanhos de tela usando media queries
+  @each $breakpoint, $min-width in $grid-breakpoints {
+    @media (min-width: $min-width) {
+      max-width: $min-width;
+    }
+  }
+}
