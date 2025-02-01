@@ -1,8 +1,89 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './styles.scss';
+import SearchBar from '../../components/search-bar';
+import { pokeApiService } from '../../services/poke-api';
+import { PokeApiPokemon, PokeApiPokemonPaginate } from '../../services/poke-api/types';
+import CardList from '../../components/card-list';
+import CardDetail from '../../components/card-detail';
 
-function Home() {
+const Home = () => {
+  const [params, setParams] = useState({ limit: 50, offset: 0 })
+  const [hasNextPage, setHasNextPage] = useState<boolean>(true)
+  const [total, setTotal] = useState<number | null>(null)
+  const [pokemons, setPokemons] = useState<PokeApiPokemonPaginate[]>([])
+  const [selected, setSelected] = useState<PokeApiPokemon | null>(null)
+  const [isOnBottom, setIsOnBottom] = useState(false)
 
+  const getPokemons = async () => {
+    const { results, count, next } = await pokeApiService.getPaginate(params)
+  
+    if (!total) setTotal(count)
+  
+    setHasNextPage(!!next)
+    setPokemons((prev) => [...prev, ...results])
+  }
+
+  const handleScroll = () => {
+    const scrolledToBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 10;
+    setIsOnBottom(scrolledToBottom);
+  };
+
+  useEffect(() => {
+    getPokemons()
+  }, [params])
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  });
+
+  const toAddCardList = (pokemon: PokeApiPokemonPaginate) => {
+    const id = pokemon.url.match(/\/(\d+)\/$/)?.at(1);
+    if (!id) return
+
+    return (
+      <div className='col-sm-12 col-md-4' key={id}>
+        <CardList id={+id} onClick={onClickCard} />
+      </div>
+    )
+  }
+
+  const onClickSearch = async (value: string) => {}
+
+  const onClickCard = (pokemon: PokeApiPokemon) => {
+    setSelected(pokemon)
+  }
+
+  const onClickLoadMore = () => {
+    setParams((prev) => ({ ...prev, offset: prev.offset + 50 }))
+  }
+
+  return (
+    <div className='container'>
+      <div className='row' style={{ marginTop: '2rem' }}>
+        <div className='col-12 col-md-8'>
+          <div className='list'>
+            <SearchBar onClick={onClickSearch} />
+            <div className='row' style={{ marginTop: '2rem' }}>
+              {pokemons.map(toAddCardList)}
+            </div>
+          </div>
+        </div>
+        <div className='col-12 col-md-4'>
+          <div className='detail'>
+            <CardDetail pokemon={selected} />
+          </div>
+        </div>
+      </div>
+
+      {isOnBottom && hasNextPage &&
+        <button className='load-more' onClick={onClickLoadMore}>
+          Load more
+        </button>
+      }
+
+    </div>
+  )
 }
 
 export default Home;
