@@ -61,18 +61,14 @@ const Home = () => {
   return (
     <div className='container'>
       <div className='row' style={{ marginTop: '2rem' }}>
-        <div className='col-12 col-md-8'>
-          <div className='list'>
-            <SearchBar onClick={onClickSearch} />
-            <div className='row' style={{ marginTop: '2rem' }}>
-              {pokemons.map(toAddCardList)}
-            </div>
+        <div className='col-12 col-lg-8' style={{ padding: '12px'}}>
+          <SearchBar onClick={onClickSearch} />
+          <div className='row' style={{ marginTop: '2rem' }}>
+            {pokemons.map(toAddCardList)}
           </div>
         </div>
-        <div className='col-12 col-md-4'>
-          <div className='detail'>
-            <CardDetail pokemon={selected} />
-          </div>
+        <div className='col-12 col-lg-4'>
+          <CardDetail pokemon={selected} />
         </div>
       </div>
 

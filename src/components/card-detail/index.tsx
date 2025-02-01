@@ -3,6 +3,7 @@ import './styles.scss'
 import { CardDetailProps } from "./types"
 import { PokeApiPokemonEvolutionChain, PokeApiPokemonSpecie } from "../../services/poke-api/types"
 import { pokeApiService } from "../../services/poke-api"
+import { POKE_API_IMAGE_URL } from "../../@constants/images"
 
 const CardDetail: React.FC<CardDetailProps> = ({ pokemon }) => {
     const [specie, setSpecie] = useState<PokeApiPokemonSpecie | null>(null)
@@ -26,7 +27,19 @@ const CardDetail: React.FC<CardDetailProps> = ({ pokemon }) => {
 
     return (
         <div className="card-detail">
-            <h1>{pokemon?.name}</h1>
+            <img
+                className="card-detail-image"
+                src={pokemon ? `${POKE_API_IMAGE_URL}/versions/generation-v/black-white/animated/${pokemon.id}.gif` : ''}
+            />
+
+            <div className='card-detail-info'>
+                <h4 className="card-detail-title">
+                    {pokemon
+                        ? pokemon.name
+                        : 'Select a pokemon to display here'
+                    }
+                </h4>
+            </div>
         </div>
     )
 }
