@@ -139,3 +139,13 @@ $col-12: 100%;
       &-lg-12 { flex: 0 0 100%; max-width: 100%; }
   }
 }
+
+.muted {
+  color: #a9a9a9;
+  font-weight: 800;
+}
+
+.subtitle {
+  margin: 0;
+  font-weight: 700;
+}
