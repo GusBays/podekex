@@ -5,8 +5,13 @@ import { pokeApiService } from '../../services/poke-api';
 import { PokeApiPokemon, PokeApiPokemonPaginate } from '../../services/poke-api/types';
 import CardList from '../../components/card-list';
 import CardDetail from '../../components/card-detail';
+import { HttpFacade } from '../../services/http/facade';
+import { useLoading } from '../../providers/loader';
 
 const Home = () => {
+  const { setLoading } = useLoading()
+  HttpFacade.setLoading = setLoading
+
   const [params, setParams] = useState({ limit: 50, offset: 0 })
   const [hasNextPage, setHasNextPage] = useState<boolean>(true)
   const [total, setTotal] = useState<number | null>(null)
@@ -58,6 +63,11 @@ const Home = () => {
     setParams((prev) => ({ ...prev, offset: prev.offset + 50 }))
   }
 
+  const onClickEvolution = async (id: number) => {
+    const row = await pokeApiService.getOne(id)
+    setSelected(row)
+  } 
+
   return (
     <div className='container'>
       <div className='row' style={{ marginTop: '2rem' }}>
@@ -68,7 +78,7 @@ const Home = () => {
           </div>
         </div>
         <div className='col-12 col-lg-4'>
-          <CardDetail pokemon={selected} />
+          <CardDetail pokemon={selected} onClickEvolution={onClickEvolution} />
         </div>
       </div>
 

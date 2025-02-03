@@ -3,13 +3,17 @@ import ReactDOM from 'react-dom/client';
 import './index.scss';
 import Home from './views/Home';
 import reportWebVitals from './reportWebVitals';
+import { LoadingProvider } from './providers/loader';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
+
 root.render(
   <React.StrictMode>
-    <Home />
+    <LoadingProvider>
+      <Home />
+    </LoadingProvider>
   </React.StrictMode>
 );
 

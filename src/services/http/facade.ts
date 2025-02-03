@@ -3,6 +3,7 @@ import { HttpService } from "./types"
 
 export class HttpFacade {
     static instance: HttpService
+    static setLoading: (loading: boolean) => void
 
     static async getOne<T = any>(uri: string): Promise<T> {
         return await this.getInstance().getOne(uri)
@@ -17,7 +18,7 @@ export class HttpFacade {
             const driver = process.env.REACT_APP_HTTP_DRIVER || 'alova'
 
             const handlers: Record<string, () => HttpService> = {
-                'alova': () => new AlovaService()
+                'alova': () => new AlovaService(this.setLoading)
             }
     
             const handler = handlers[driver]

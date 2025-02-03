@@ -5,20 +5,24 @@ import { HttpService } from "./types";
 export class AlovaService implements HttpService {
     private alova: Alova<AlovaGenerics>
 
-    constructor() {
+    constructor(private setLoading: (loading: boolean) => void) {
         this.alova = createAlova({
-            requestAdapter: adapterFetch()
+            requestAdapter: adapterFetch(),
+            beforeRequest: () => this.setLoading(true)
+            ,
+            responded: {
+                onComplete: () => this.setLoading(false),
+                onSuccess: async (response) => await response.json()
+            }
         })
     }
 
     async getOne<T = any>(uri: string): Promise<T> {
-        const response = await this.alova.Get<Response>(uri)
-        return await response.json()
+        return await this.alova.Get<T>(uri)
     }
 
     async getPaginate<P = any, T = any>(uri: string, params?: P): Promise<T> {
-        const response = await this.alova.Get<Response>(uri, { params })
-        return await response.json()
+        return await this.alova.Get<T>(uri, { params })
     }
 }
 
