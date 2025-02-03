@@ -120,9 +120,19 @@ export interface PokeApiPokemonStat {
   base_stat: number;
   effort: number;
   stat: {
-    name: string;
+    name: PokeApiPokemonStatTypeEnum;
     url: string;
   };
+}
+
+export enum PokeApiPokemonStatTypeEnum {
+  HP = 'hp',
+  ATTACK = 'attack',
+  DEFENSE = 'defense',
+  SPECIAL_ATTACK = 'special-attack',
+  SPECIAL_DEFENSE = 'special-defense',
+  SPEED = 'speed',
+  TOTAL = 'total'
 }
 
 export interface PokeApiPokemonType {
