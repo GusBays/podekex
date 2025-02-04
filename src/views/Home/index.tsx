@@ -16,6 +16,7 @@ const Home = () => {
   const [hasNextPage, setHasNextPage] = useState<boolean>(true)
   const [total, setTotal] = useState<number | null>(null)
   const [pokemons, setPokemons] = useState<PokeApiPokemonPaginate[]>([])
+  const [searched, setSearched] = useState<PokeApiPokemonPaginate[] | null>(null)
   const [selected, setSelected] = useState<PokeApiPokemon | null>(null)
   const [isOnBottom, setIsOnBottom] = useState(false)
 
@@ -44,6 +45,7 @@ const Home = () => {
 
   const toAddCardList = (pokemon: PokeApiPokemonPaginate) => {
     const id = pokemon.url.match(/\/(\d+)\/$/)?.at(1);
+
     if (!id) return
 
     return (
@@ -53,20 +55,28 @@ const Home = () => {
     )
   }
 
-  const onClickSearch = async (value: string) => {}
-
-  const onClickCard = (pokemon: PokeApiPokemon) => {
-    setSelected(pokemon)
+  const onClickSearch = async (value: string) => {
+    if (!value) setSearched(null)
+    else {
+      const byQueryString = (p: PokeApiPokemonPaginate) => p.name.includes(value)
+      const res = pokemons.filter(byQueryString)
+      setSearched(res)
+    }
   }
 
+  const onClickCard = (pokemon: PokeApiPokemon) => setSelected(pokemon)
+
   const onClickLoadMore = () => {
-    setParams((prev) => ({ ...prev, offset: prev.offset + 50 }))
+    const setNewOffset = (prev: { limit: number, offset: number }) => ({ ...prev, offset: prev.offset + 50 })
+    setParams(setNewOffset)
   }
 
   const onClickEvolution = async (id: number) => {
     const row = await pokeApiService.getOne(id)
     setSelected(row)
-  } 
+  }
+
+  const onClickClose = () => setSelected(null)
 
   return (
     <div className='container'>
@@ -74,11 +84,11 @@ const Home = () => {
         <div className='col-12 col-lg-8' style={{ padding: '12px'}}>
           <SearchBar onClick={onClickSearch} />
           <div className='row' style={{ marginTop: '2rem' }}>
-            {pokemons.map(toAddCardList)}
+            {searched ? searched.map(toAddCardList) : pokemons.map(toAddCardList)}
           </div>
         </div>
         <div className='col-12 col-lg-4'>
-          <CardDetail pokemon={selected} onClickEvolution={onClickEvolution} />
+          <CardDetail pokemon={selected} onClickEvolution={onClickEvolution} onClickClose={onClickClose} />
         </div>
       </div>
 
