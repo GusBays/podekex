@@ -7,7 +7,7 @@ import { POKE_API_IMAGE_URL } from "../../@constants/images"
 import { getColorByStat, getColorByType, getTextByStat } from "../../utils/pokemon"
 import Pill from "../pill"
 
-const CardDetail: React.FC<CardDetailProps> = ({ pokemon, onClickEvolution }) => {
+const CardDetail: React.FC<CardDetailProps> = ({ pokemon, onClickEvolution, onClickClose }) => {
     const [specie, setSpecie] = useState<PokeApiPokemonSpecie | null>(null)
     const [evolutionChain, setEvolutionChain] = useState<PokeApiPokemonEvolutionChain | null>(null)
 
@@ -46,40 +46,42 @@ const CardDetail: React.FC<CardDetailProps> = ({ pokemon, onClickEvolution }) =>
     const toRenderStats = (stat: PokeApiPokemonStat) => {
         const key = `${pokemon?.id}-${stat.stat.name}`
         return (
-            <div className="stat">
-                <Pill key={key} text={getTextByStat(stat)} color={getColorByStat(stat)} rounded={true} />
+            <div className="stat" key={key}>
+                <Pill text={getTextByStat(stat)} color={getColorByStat(stat)} rounded={true} />
                 <span>{stat.base_stat.toString()}</span>
             </div>
         )
     }
 
     const toRenderEvolution = (evolution: PokeApiPokemonEvolutionChainChain): ReactNode => {
-        const id = evolution.species.url.match(/\/(\d+)\/$/)?.at(1)
+        const evolutionId = evolution.species.url.match(/\/(\d+)\/$/)?.at(1)
 
-        if (!id) return null
+        if (!evolutionId) return null
 
-        const key = `${id}-${evolution.species.name}`
+        const key = `${pokemon?.id}-${evolutionId}-${evolution.species.name}`
         const details = evolution.evolution_details[0]
         const nextEvolution = evolution.evolves_to
 
         return (
-            /** @ts-ignore */
-            <>
-                <div className="card-evolution" key={key}>
+            <React.Fragment key={key}>
+                <div className="card-evolution">
                     {details?.min_level && 
                         <Pill text={details?.min_level.toString()} color={'#F6F8FC'} />
                     }
-                    <button onClick={async () => await onClickEvolution(+id)} disabled={!id || +id === pokemon?.id}>
-                        <img src={`${POKE_API_IMAGE_URL}/${id}.png`} />
+                    <button onClick={async () => await onClickEvolution(+evolutionId)} disabled={!evolutionId || +evolutionId === pokemon?.id}>
+                        <img src={`${POKE_API_IMAGE_URL}/${evolutionId}.png`} />
                     </button>
                 </div>
                 {nextEvolution && nextEvolution.map(toRenderEvolution)}
-            </>
+            </React.Fragment>
         )
     }
 
     return (
-        <div className="card-detail">
+        <div className={`card-detail ${pokemon ? 'open': ''}`} style={{backgroundColor: pokemon ? getColorByType(pokemon.types[0]) : 'transparent'}}>
+            <button className="close-button" onClick={onClickClose}>
+                <span className="material-symbols-outlined">close</span>
+            </button>
             <img
                 className="card-detail-image"
                 src={pokemon
@@ -99,7 +101,7 @@ const CardDetail: React.FC<CardDetailProps> = ({ pokemon, onClickEvolution }) =>
                     {pokemon && pokemon.types.map(toRenderTypes)}
                 </div>
 
-                {specie &&
+                {pokemon && specie &&
                     <div className="card-description">
                         <h5 className="subtitle">Description</h5>
                         <p className="muted" style={{ fontSize: '0.8rem'}}>{specie.flavor_text_entries.find(byEnglish)?.flavor_text}</p>
@@ -137,7 +139,7 @@ const CardDetail: React.FC<CardDetailProps> = ({ pokemon, onClickEvolution }) =>
                     </div>
                 }
 
-                {evolutionChain &&
+                {pokemon &&evolutionChain &&
                     <div className="card-evolutions-container">
                         <h5 className="subtitle">Evolution</h5>
                         <div className="card-evolutions">
